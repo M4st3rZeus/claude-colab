@@ -9,7 +9,6 @@ from __future__ import annotations
 import json
 import time
 from datetime import datetime, timezone
-from typing import Optional, Tuple, Union
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -25,7 +24,7 @@ SESSION_WARN_HOURS = 10
 _last_health_check: float = 0
 
 
-def _get_client_and_config() -> Tuple[Optional[ColabClient], Optional[dict]]:
+def _get_client_and_config() -> tuple[ColabClient | None, dict | None]:
     """Load config and create client. Returns (client, config) or (None, None)."""
     config = load_config()
     if config is None:
@@ -38,7 +37,7 @@ def _get_client_and_config() -> Tuple[Optional[ColabClient], Optional[dict]]:
     return client, config
 
 
-def _check_session_age(connected_at_iso: str) -> Optional[str]:
+def _check_session_age(connected_at_iso: str) -> str | None:
     """Warn if session is old. Takes ISO 8601 string from config."""
     try:
         connected_dt = datetime.fromisoformat(connected_at_iso.replace("Z", "+00:00"))
@@ -53,7 +52,7 @@ def _check_session_age(connected_at_iso: str) -> Optional[str]:
     return None
 
 
-def _ensure_healthy(client: ColabClient, last_check: Optional[float] = None) -> Optional[str]:
+def _ensure_healthy(client: ColabClient, last_check: float | None = None) -> str | None:
     """Lazy health check. Returns error/warning string or None."""
     global _last_health_check
     check_time = last_check if last_check is not None else _last_health_check
@@ -74,7 +73,7 @@ def _not_connected_error() -> str:
     return "Not connected. Run: claude-colab connect cc://TOKEN:KEY@host"
 
 
-def _prepare_call() -> Tuple[Optional[ColabClient], list]:
+def _prepare_call() -> tuple[ColabClient | None, list]:
     """Common setup for all tool calls. Returns (client, warnings)."""
     client, config = _get_client_and_config()
     if client is None:
@@ -90,7 +89,7 @@ def _prepare_call() -> Tuple[Optional[ColabClient], list]:
     return client, warnings
 
 
-def colab_status() -> Union[dict, str]:
+def colab_status() -> dict | str:
     """Get GPU status."""
     client, warnings = _prepare_call()
     if client is None:
@@ -104,7 +103,7 @@ def colab_status() -> Union[dict, str]:
         return str(e)
 
 
-def colab_exec(command: str, timeout: int = 300) -> Union[dict, str]:
+def colab_exec(command: str, timeout: int = 300) -> dict | str:
     """Run a shell command on Colab."""
     client, warnings = _prepare_call()
     if client is None:
@@ -118,7 +117,7 @@ def colab_exec(command: str, timeout: int = 300) -> Union[dict, str]:
         return str(e)
 
 
-def colab_python(code: str, timeout: int = 300) -> Union[dict, str]:
+def colab_python(code: str, timeout: int = 300) -> dict | str:
     """Execute Python code on Colab."""
     client, warnings = _prepare_call()
     if client is None:
@@ -132,7 +131,7 @@ def colab_python(code: str, timeout: int = 300) -> Union[dict, str]:
         return str(e)
 
 
-def colab_upload(local_path: str, remote_path: str) -> Union[dict, str]:
+def colab_upload(local_path: str, remote_path: str) -> dict | str:
     """Upload a file to Colab."""
     client, warnings = _prepare_call()
     if client is None:
@@ -146,7 +145,7 @@ def colab_upload(local_path: str, remote_path: str) -> Union[dict, str]:
         return str(e)
 
 
-def colab_download(remote_path: str, local_path: str) -> Union[dict, str]:
+def colab_download(remote_path: str, local_path: str) -> dict | str:
     """Download a file from Colab."""
     client, warnings = _prepare_call()
     if client is None:

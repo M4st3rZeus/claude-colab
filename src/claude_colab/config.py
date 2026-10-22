@@ -7,7 +7,6 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Tuple
 
 
 def config_path() -> Path:
@@ -15,7 +14,7 @@ def config_path() -> Path:
     return Path.home() / ".claude-colab.json"
 
 
-def parse_uri(uri: str) -> Tuple[str, str, str]:
+def parse_uri(uri: str) -> tuple[str, str, str]:
     """Parse a cc://TOKEN:KEY@host URI into (url, token, encryption_key).
 
     Raises ValueError if the URI is malformed.
@@ -56,7 +55,7 @@ def save_config(url: str, token: str, encryption_key: str) -> Path:
     return path
 
 
-def load_config() -> Optional[dict]:
+def load_config() -> dict | None:
     """Load connection config from disk. Returns None if file doesn't exist."""
     path = config_path()
     if not path.exists():

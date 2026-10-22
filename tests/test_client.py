@@ -30,7 +30,7 @@ class TestHealth:
     def test_returns_gpu_info(self, client):
         health_data = {
             "status": "ok",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "gpu_name": "Tesla T4",
             "vram_total": 15.0,
             "vram_used": 1.2,

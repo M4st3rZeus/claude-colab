@@ -25,6 +25,8 @@ Colab (T4 GPU)                              Your Mac / PC
 
 ### Install
 
+Requires Python 3.10+.
+
 ```bash
 pip install claude-colab
 ```

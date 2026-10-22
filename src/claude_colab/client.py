@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import base64
 from pathlib import Path
-from typing import Optional, Union
 
 import httpx
 
@@ -26,7 +25,7 @@ class ColabError(Exception):
 class ColabClient:
     """HTTP client for the claude-colab Colab runtime API."""
 
-    def __init__(self, url: str, token: str, encryption_key: Union[bytes, str]):
+    def __init__(self, url: str, token: str, encryption_key: bytes | str):
         self.url = url.rstrip("/")
         self.token = token
         if isinstance(encryption_key, str):

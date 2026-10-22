@@ -54,7 +54,7 @@ class TestStatus:
         mock_client = MagicMock()
         mock_client.health.return_value = {
             "status": "ok",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "gpu_name": "Tesla T4",
             "vram_total": 15.0,
             "vram_used": 1.2,
@@ -227,4 +227,4 @@ class TestStatusError:
 class TestVersion:
     def test_shows_version(self, runner):
         result = runner.invoke(main, ["--version"])
-        assert "0.1.0" in result.output
+        assert "0.2.0" in result.output

@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from claude_colab import __version__
 from claude_colab.mcp_server import (
     _check_session_age,
     _ensure_healthy,
@@ -32,7 +33,7 @@ def mock_client():
     client = MagicMock()
     client.health.return_value = {
         "status": "ok",
-        "version": "0.1.0",
+        "version": __version__,
         "gpu_name": "Tesla T4",
         "vram_total": 15.0,
         "vram_used": 1.2,
@@ -104,6 +105,9 @@ class TestSessionAge:
         old = (datetime.now(timezone.utc) - timedelta(hours=11)).isoformat()
         warning = _check_session_age(old)
         assert "expire soon" in warning
+
+    def test_z_suffix_parsed(self):
+        assert "expire soon" in _check_session_age("2020-01-01T00:00:00Z")
 
     def test_invalid_date_no_crash(self):
         warning = _check_session_age("not-a-date")
