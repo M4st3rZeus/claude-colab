@@ -227,4 +227,4 @@ class TestStatusError:
 class TestVersion:
     def test_shows_version(self, runner):
         result = runner.invoke(main, ["--version"])
-        assert "0.2.0" in result.output
+        assert "0.2.1" in result.output

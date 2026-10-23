@@ -11,7 +11,7 @@ Colab (T4 GPU)                              Your Mac / PC
 ┌─────────────────────────┐                 ┌──────────────────────┐
 │ Flask API               │                 │ claude-colab CLI     │
 │  /exec, /python,        │◄── HTTPS ──────►│  or                  │
-│  /upload, /download     │  (cloudflared)  │ MCP Server           │
+│  /upload, /download     │    (tunnel)     │ MCP Server           │
 │                         │  E2E encrypted  │  (Claude Code tools) │
 │ Bearer token + Fernet   │                 │                      │
 └─────────────────────────┘                 └──────────────────────┘
@@ -33,12 +33,27 @@ pip install claude-colab
 
 ### Start the Colab server
 
-Open [`notebooks/claude_colab_server.ipynb`](notebooks/claude_colab_server.ipynb) in Google Colab. Set runtime to **T4 GPU**. Run all cells. Copy the connection string.
+Open [`notebooks/claude_colab_server.ipynb`](notebooks/claude_colab_server.ipynb) in Google Colab. Set runtime to **T4 GPU**. Pick a tunnel in Cell 1, run all cells, and copy the connection string.
+
+#### Choose a tunnel
+
+| Tunnel | Account | When to use |
+|--------|---------|-------------|
+| `cloudflare` (default) | None | Works on most networks |
+| `ngrok` | Free [ngrok account](https://dashboard.ngrok.com) | Your network blocks `*.trycloudflare.com` |
+
+For ngrok, add your authtoken in Colab's 🔑 **Secrets** tab as `NGROK_AUTHTOKEN` and enable notebook access. A fallback form field exists, but it saves the token in the notebook.
+
+If `claude-colab status` reports `Cannot reach ...`, check whether Cloudflare quick tunnels are blocked on your network:
+
+```bash
+curl -I https://trycloudflare.com   # a connection timeout means blocked, so switch to ngrok
+```
 
 ### Connect
 
 ```bash
-claude-colab connect cc://TOKEN:KEY@your-tunnel.trycloudflare.com
+claude-colab connect cc://TOKEN:KEY@your-tunnel.trycloudflare.com   # or ...@xxxx.ngrok-free.app
 ```
 
 ### Use it
@@ -113,7 +128,7 @@ All request and response bodies are encrypted with [Fernet](https://cryptography
 | Actor | Can see | Cannot see |
 |-------|---------|------------|
 | Random user | Nothing (no token) | Everything |
-| Cloudflare | URL paths, timing, token | Request/response bodies |
+| Tunnel provider (Cloudflare / ngrok) | URL paths, timing, token | Request/response bodies |
 | Google (Colab) | Everything on the VM | Your local files |
 
 ### What we don't protect against
