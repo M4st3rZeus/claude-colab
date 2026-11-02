@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import base64
 from pathlib import Path
-from typing import Optional, Union
 
 import httpx
 
@@ -26,7 +25,7 @@ class ColabError(Exception):
 class ColabClient:
     """HTTP client for the claude-colab Colab runtime API."""
 
-    def __init__(self, url: str, token: str, encryption_key: Union[bytes, str]):
+    def __init__(self, url: str, token: str, encryption_key: bytes | str):
         self.url = url.rstrip("/")
         self.token = token
         if isinstance(encryption_key, str):
@@ -36,6 +35,14 @@ class ColabClient:
         self._http = httpx.Client(
             headers={"Authorization": f"Bearer {self.token}"},
             timeout=httpx.Timeout(MAX_TIMEOUT + 30),
+        )
+
+    def _unreachable_message(self) -> str:
+        """Error shown when the tunnel host cannot be reached at all."""
+        return (
+            f"Cannot reach {self.url}. The Colab notebook may have stopped, or your "
+            "network may be blocking the tunnel (try the other tunnel option in the "
+            "notebook, or a VPN)."
         )
 
     def _post_encrypted(self, endpoint: str, data: dict, timeout: int = DEFAULT_TIMEOUT) -> dict:
@@ -49,9 +56,7 @@ class ColabClient:
                 headers={"Content-Type": "application/octet-stream"},
             )
         except (httpx.ConnectError, httpx.ConnectTimeout):
-            raise ColabError(
-                "Colab session may have timed out. Restart the notebook and reconnect."
-            )
+            raise ColabError(self._unreachable_message())
         except httpx.ReadTimeout:
             raise ColabError(
                 f"Command timed out after {timeout}s. Use --timeout to increase."
@@ -66,9 +71,7 @@ class ColabClient:
         try:
             resp = self._http.get(f"{self.url}/health")
         except (httpx.ConnectError, httpx.ConnectTimeout):
-            raise ColabError(
-                "Colab session may have timed out. Restart the notebook and reconnect."
-            )
+            raise ColabError(self._unreachable_message())
         if resp.status_code == 401:
             raise ColabError("Invalid token. Check your connection string.")
         resp.raise_for_status()

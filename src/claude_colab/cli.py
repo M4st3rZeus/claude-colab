@@ -6,7 +6,6 @@ import asyncio
 import sys
 import uuid
 from pathlib import Path
-from typing import Optional
 
 import click
 
@@ -15,7 +14,7 @@ from claude_colab.client import ColabClient, ColabError
 from claude_colab.config import clear_config, load_config, parse_uri, save_config
 
 
-def _get_client() -> Optional[ColabClient]:
+def _get_client() -> ColabClient | None:
     """Load config and return a ColabClient, or None if not connected."""
     config = load_config()
     if config is None:
@@ -47,7 +46,7 @@ def main():
 
 @main.command()
 @click.argument("uri", required=False)
-def connect(uri: Optional[str]):
+def connect(uri: str | None):
     """Save Colab connection details.
 
     URI format: cc://TOKEN:KEY@hostname

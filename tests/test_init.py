@@ -3,7 +3,7 @@
 
 def test_version():
     from claude_colab import __version__
-    assert __version__ == "0.1.0"
+    assert __version__ == "0.2.1"
 
 
 def test_lazy_import_colab_client():

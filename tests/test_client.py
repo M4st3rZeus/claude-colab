@@ -30,7 +30,7 @@ class TestHealth:
     def test_returns_gpu_info(self, client):
         health_data = {
             "status": "ok",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "gpu_name": "Tesla T4",
             "vram_total": 15.0,
             "vram_used": 1.2,
@@ -62,7 +62,7 @@ class TestHealth:
         respx.get("https://test.trycloudflare.com/health").mock(
             side_effect=httpx.ConnectError("refused")
         )
-        with pytest.raises(ColabError, match="timed out"):
+        with pytest.raises(ColabError, match="Cannot reach https://test.trycloudflare.com"):
             client.health()
 
 
@@ -140,6 +140,16 @@ class TestTimeout:
         )
         with pytest.raises(ColabError, match="timed out"):
             client.exec("sleep 999")
+
+
+class TestConnectionError:
+    @respx.mock
+    def test_post_connect_error_raises(self, client):
+        respx.post("https://test.trycloudflare.com/exec").mock(
+            side_effect=httpx.ConnectTimeout("timeout")
+        )
+        with pytest.raises(ColabError, match="blocking the tunnel"):
+            client.exec("echo hi")
 
 
 class TestStringKey:

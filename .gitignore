@@ -12,3 +12,5 @@ venv/
 .venv/
 .DS_Store
 *.mp4
+.devcontainer
+experiment_assets

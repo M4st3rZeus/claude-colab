@@ -1,6 +1,6 @@
 """claude-colab — Give Claude Code GPU access via Google Colab."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.1"
 
 
 def __getattr__(name):
